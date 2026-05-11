@@ -134,11 +134,18 @@ export default function PaymentModal({
 
   return (
     <div className="checkout-blur fixed inset-0 z-50 grid place-items-center bg-[#020617]/70 px-4 backdrop-blur-md">
-      <div className="w-full max-w-md rounded-lg border border-white/12 bg-[#091622] p-6 text-center shadow-2xl shadow-black/40">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkout-title"
+        className="w-full max-w-md rounded-lg border border-white/12 bg-[#091622] p-6 text-center shadow-2xl shadow-black/40"
+      >
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-lg bg-cyan-300 text-lg font-black text-slate-950">
           $
         </div>
-        <h2 className="mt-5 text-2xl font-black text-white">Secure Creem checkout</h2>
+        <h2 id="checkout-title" className="mt-5 text-2xl font-black text-white">
+          Secure Creem checkout
+        </h2>
         <p className="mt-3 text-sm leading-6 text-slate-300">
           {status === "opening" && `Preparing ${planName} checkout in a centered payment window.`}
           {status === "opened" && "The payment window is open. This page will stay here while checkout runs."}
