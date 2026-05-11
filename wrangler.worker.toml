@@ -14,7 +14,7 @@ CREEM_ENV = "live"
 
 [[kv_namespaces]]
 binding = "ANALYTICS_KV"
-id = "REPLACE_WITH_ANALYTICS_KV_ID"
+id = "1126990c054741639b994ee8f1173631"
 
 [assets]
 directory = "./out"
