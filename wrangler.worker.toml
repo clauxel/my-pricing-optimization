@@ -1,0 +1,41 @@
+name = "my-pricing-optimization"
+main = "worker/index.js"
+compatibility_date = "2026-05-11"
+workers_dev = true
+routes = [
+  { pattern = "pricing-optimization.space/*", zone_name = "pricing-optimization.space" },
+  { pattern = "www.pricing-optimization.space/*", zone_name = "pricing-optimization.space" }
+]
+
+[vars]
+APP_ORIGIN = "https://pricing-optimization.space"
+CREEM_API_BASE = "https://api.creem.io"
+CREEM_ENV = "live"
+
+[[kv_namespaces]]
+binding = "ANALYTICS_KV"
+id = "REPLACE_WITH_ANALYTICS_KV_ID"
+
+[assets]
+directory = "./out"
+binding = "SITE_ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = [
+  "/",
+  "/pricing",
+  "/pricing-optimization-tools",
+  "/pricing-optimization-machine-learning",
+  "/pricing-optimization-strategy",
+  "/price-optimization-techniques",
+  "/price-optimization-example",
+  "/price-optimization-software",
+  "/dynamic-pricing",
+  "/optimization-meaning",
+  "/resources/*",
+  "/privacy",
+  "/terms",
+  "/checkout/done",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/api/*"
+]

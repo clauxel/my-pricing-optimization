@@ -1,0 +1,8 @@
+name = "my-pricing-optimization"
+compatibility_date = "2026-05-11"
+pages_build_output_dir = "out"
+
+[vars]
+APP_ORIGIN = "https://pricing-optimization.space"
+CREEM_API_BASE = "https://api.creem.io"
+CREEM_ENV = "live"
