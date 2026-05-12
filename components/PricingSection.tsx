@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PaymentModal, { openCheckoutShell } from "./PaymentModal";
 
 type Billing = "monthly" | "annual";
@@ -19,7 +19,7 @@ const plans = [
       "Segment price range report",
       "Pricing page A/B test brief",
     ],
-    cta: "Checkout Single",
+    cta: "Continue with Single",
     paid: true,
   },
   {
@@ -37,7 +37,7 @@ const plans = [
       "Executive pricing recommendation deck",
       "Priority support",
     ],
-    cta: "Checkout Multi",
+    cta: "Continue with Multi",
     paid: true,
     highlight: true,
   },
@@ -72,7 +72,37 @@ export default function PricingSection() {
     popup: Window | null;
   }>({ planId: "multi", planName: "Multi Product", popup: null });
   const [launchKey, setLaunchKey] = useState(0);
+  const [planFlowOpen, setPlanFlowOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    function onChoosePlan(event: Event) {
+      const detail = (event as CustomEvent<{ plan?: string; billing?: Billing; source?: string }>).detail || {};
+      const planKey = plans.some((plan) => plan.key === detail.plan && plan.paid) ? detail.plan! : "multi";
+      if (detail.billing) setBilling(detail.billing);
+      setSelectedPlan(planKey);
+      setPlanFlowOpen(true);
+      trackEvent("plan_flow_opened", {
+        source: detail.source || "site_cta",
+        plan: planKey,
+        billing: detail.billing || "annual",
+      });
+    }
+
+    window.addEventListener("pricingoptimization:choose-plan", onChoosePlan);
+
+    if (window.location.hash === "#choose-multi") {
+      window.history.replaceState(null, "", window.location.pathname);
+      window.setTimeout(() => {
+        setBilling("annual");
+        setSelectedPlan("multi");
+        setPlanFlowOpen(true);
+        trackEvent("plan_flow_opened", { source: "hash_cta", plan: "multi", billing: "annual" });
+      }, 0);
+    }
+
+    return () => window.removeEventListener("pricingoptimization:choose-plan", onChoosePlan);
+  }, []);
 
   const annualSavings = useMemo(() => {
     const multi = plans.find((plan) => plan.key === "multi")!;
@@ -91,11 +121,23 @@ export default function PricingSection() {
       window.location.assign("mailto:support@aigeamy.com?subject=Pricing%20Optimization%20Enterprise");
       return;
     }
+    setPlanFlowOpen(true);
+  }
+
+  function continueToPayment() {
+    const plan = plans.find((item) => item.key === selectedPlan) || plans[1];
+    if (!plan.paid) return;
     const popup = openCheckoutShell(plan.name);
     setCheckout({ planId: plan.key, planName: plan.name, popup });
+    setPlanFlowOpen(false);
     setLaunchKey((value) => value + 1);
     setModalOpen(true);
+    trackEvent("checkout_continue", { plan: plan.key, billing });
   }
+
+  const activePlan = plans.find((plan) => plan.key === selectedPlan) || plans[1];
+  const activeMonthly = effectiveMonthly(activePlan);
+  const activeYearlyTotal = activeMonthly * 12;
 
   return (
     <section id="pricing" className="border-t border-white/10 bg-[#071019] py-20 md:py-28">
@@ -217,6 +259,120 @@ export default function PricingSection() {
           })}
         </div>
       </div>
+
+      {planFlowOpen ? (
+        <div
+          className="checkout-blur fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#020617]/70 px-4 py-6 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pricing-plan-flow-title"
+          onClick={(event) => {
+            if (event.currentTarget === event.target) setPlanFlowOpen(false);
+          }}
+        >
+          <div className="relative w-full max-w-5xl rounded-lg border border-white/12 bg-[#091622] p-5 shadow-2xl shadow-black/40 md:p-7">
+            <button
+              type="button"
+              onClick={() => setPlanFlowOpen(false)}
+              className="absolute right-4 top-4 rounded-md border border-white/12 px-2.5 py-1.5 text-sm font-bold text-slate-300 hover:bg-white/5"
+              aria-label="Close plan chooser"
+            >
+              x
+            </button>
+            <div className="max-w-3xl pr-10">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-200">Choose your plan</p>
+              <h2 id="pricing-plan-flow-title" className="mt-3 text-3xl font-black text-white md:text-5xl">
+                Launch Pricing Optimization with the right model tier
+              </h2>
+              <p className="mt-4 text-base leading-8 text-slate-400">
+                Start pricing audit opens plan selection first. Annual billing keeps the same path and drops Multi
+                Product to half price before secure checkout.
+              </p>
+            </div>
+
+            <div className="mt-7 grid w-fit grid-cols-2 rounded-lg border border-white/10 bg-slate-950/70 p-1">
+              {(["annual", "monthly"] as Billing[]).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => {
+                    setBilling(option);
+                    trackEvent("billing_selected", { billing: option });
+                  }}
+                  className={`rounded-md px-5 py-2.5 text-sm font-bold transition ${
+                    billing === option ? "bg-cyan-300 text-slate-950" : "text-slate-300 hover:bg-white/5"
+                  }`}
+                >
+                  {option === "annual" ? "Yearly 50% off" : "Monthly"}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-7 grid gap-4 md:grid-cols-2">
+              {plans
+                .filter((plan) => plan.paid)
+                .map((plan) => {
+                  const monthly = effectiveMonthly(plan);
+                  const yearlyTotal = monthly * 12;
+                  const active = activePlan.key === plan.key;
+                  return (
+                    <button
+                      key={plan.key}
+                      type="button"
+                      onClick={() => setSelectedPlan(plan.key)}
+                      className={`rounded-lg border p-5 text-left transition ${
+                        active
+                          ? "border-cyan-200 bg-cyan-300/[0.08] ring-2 ring-lime-300/70"
+                          : "border-white/10 bg-[#071019] hover:border-cyan-200/60"
+                      }`}
+                    >
+                      <span className="text-sm font-semibold text-cyan-200">{plan.scope}</span>
+                      <span className="mt-2 block text-xl font-black text-white">{plan.name}</span>
+                      <span className="mt-3 block text-sm leading-6 text-slate-300">{plan.description}</span>
+                      <span className="mt-5 flex items-end gap-2 text-white">
+                        <strong className="text-4xl">${monthly.toLocaleString("en-US")}</strong>
+                        <span className="pb-1 text-sm text-slate-400">/mo</span>
+                      </span>
+                      <span className="mt-1 block text-xs text-slate-500">
+                        {billing === "annual" ? `Billed $${yearlyTotal.toLocaleString("en-US")} yearly` : "Billed monthly"}
+                      </span>
+                    </button>
+                  );
+                })}
+            </div>
+
+            <div className="mt-7 flex flex-col gap-4 rounded-lg border border-white/10 bg-[#071019] p-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Selected plan</p>
+                <h3 className="mt-1 text-xl font-black text-white">
+                  {activePlan.name} · {billing === "annual" ? "Yearly" : "Monthly"}
+                </h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  {billing === "annual"
+                    ? `Billed $${activeYearlyTotal.toLocaleString("en-US")} yearly. Equivalent to $${activeMonthly.toLocaleString("en-US")} per month.`
+                    : `$${activeMonthly.toLocaleString("en-US")} charged monthly.`}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setPlanFlowOpen(false)}
+                  className="rounded-md border border-white/12 px-5 py-3 text-sm font-semibold text-slate-200 hover:bg-white/5"
+                >
+                  Not now
+                </button>
+                <button
+                  type="button"
+                  onClick={continueToPayment}
+                  className="rounded-md bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 hover:bg-lime-300"
+                >
+                  Continue to Payment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <PaymentModal
         isOpen={modalOpen}

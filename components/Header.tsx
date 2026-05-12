@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import type { MouseEvent } from "react";
 
 const navItems = [
   { href: "/#pricing-audit", label: "Audit" },
@@ -8,6 +11,18 @@ const navItems = [
 ];
 
 export default function Header() {
+  function choosePlan(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    window.dispatchEvent(
+      new CustomEvent("pricingoptimization:choose-plan", {
+        detail: { plan: "multi", billing: "annual", source: "header" },
+      }),
+    );
+    if (!document.getElementById("pricing")) {
+      window.location.href = "/pricing#choose-multi";
+    }
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#071019]/92 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-3 sm:px-6 lg:px-8">
@@ -33,10 +48,11 @@ export default function Header() {
         </nav>
 
         <Link
-          href="/#pricing"
+          href="/pricing"
+          onClick={choosePlan}
           className="rounded-md bg-cyan-300 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-lime-300"
         >
-          Checkout Multi
+          Start pricing audit
         </Link>
       </div>
     </header>

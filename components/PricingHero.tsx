@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 
 const segments = {
   "Seed SaaS": { multiplier: 1.18, confidence: "Medium", note: "raise entry price, protect activation" },
@@ -19,6 +20,16 @@ export default function PricingHero() {
   const [churn, setChurn] = useState(4.8);
   const [segment, setSegment] = useState<keyof typeof segments>("Growth SaaS");
 
+  function choosePlan(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    trackEvent("cta_clicked", { location: "hero_primary" });
+    window.dispatchEvent(
+      new CustomEvent("pricingoptimization:choose-plan", {
+        detail: { plan: "multi", billing: "annual", source: "hero" },
+      }),
+    );
+  }
+
   const model = useMemo(() => {
     const segmentData = segments[segment];
     const suggested = Math.round(currentPrice * segmentData.multiplier);
@@ -31,23 +42,23 @@ export default function PricingHero() {
   return (
     <section className="relative overflow-hidden bg-[#071019]">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent" />
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[0.88fr_1.12fr] lg:px-8">
-        <div className="flex flex-col justify-center text-center lg:text-left">
-          <div className="mb-6 inline-flex items-center gap-2 self-center rounded-md border border-cyan-200/25 bg-cyan-300/10 px-3 py-1.5 text-sm font-semibold text-cyan-50 lg:self-start">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-8">
+        <div className="flex flex-col text-center lg:pt-1 lg:text-left">
+          <div className="mb-4 inline-flex items-center gap-2 self-center rounded-md border border-cyan-200/25 bg-cyan-300/10 px-3 py-1.5 text-sm font-semibold text-cyan-50 lg:self-start">
             <span className="h-1.5 w-1.5 rounded-full bg-lime-300" />
             AI Pricing Optimization for B2B SaaS
           </div>
-          <h1 className="text-4xl font-black leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="text-4xl font-black leading-[1.04] text-white sm:text-5xl md:text-6xl lg:text-7xl">
             Pricing Optimization that finds the price your buyers will actually pay
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl lg:mx-0">
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-7 text-slate-300 sm:text-xl lg:mx-0">
             Your SaaS pricing may be leaving 30% on the table. Connect Stripe, scan competitors, model churn and upgrade
             behavior, then launch segmented price tests without guessing.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <a
               href="#pricing"
-              onClick={() => trackEvent("cta_clicked", { location: "hero_primary" })}
+              onClick={choosePlan}
               className="rounded-md bg-cyan-300 px-7 py-4 text-base font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:scale-[1.01] hover:bg-lime-300"
             >
               Start pricing audit
@@ -60,7 +71,7 @@ export default function PricingHero() {
               See example report
             </Link>
           </div>
-          <div className="mt-10 grid grid-cols-3 gap-4 text-center lg:text-left">
+          <div className="mt-7 grid grid-cols-3 gap-4 text-center lg:text-left">
             {[
               ["30%", "common underpricing gap"],
               ["14 days", "first experiment"],

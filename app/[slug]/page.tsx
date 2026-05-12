@@ -59,7 +59,7 @@ export default async function KeywordPage({ params }: PageProps) {
               <h2 className="text-lg font-black text-white">Decision principle</h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">{page.thesis}</p>
               <Link
-                href="/#pricing"
+                href="/pricing#choose-multi"
                 className="mt-6 inline-flex w-full justify-center rounded-md bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 hover:bg-lime-300"
               >
                 Start pricing audit
