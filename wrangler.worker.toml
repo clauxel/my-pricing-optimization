@@ -12,30 +12,16 @@ APP_ORIGIN = "https://pricing-optimization.space"
 CREEM_API_BASE = "https://api.creem.io"
 CREEM_ENV = "live"
 
-[[kv_namespaces]]
-binding = "ANALYTICS_KV"
-id = "1126990c054741639b994ee8f1173631"
-
 [assets]
 directory = "./out"
 binding = "SITE_ASSETS"
 not_found_handling = "single-page-application"
 run_worker_first = [
-  "/",
-  "/pricing",
-  "/pricing-optimization-tools",
-  "/pricing-optimization-machine-learning",
-  "/pricing-optimization-strategy",
-  "/price-optimization-techniques",
-  "/price-optimization-example",
-  "/price-optimization-software",
-  "/dynamic-pricing",
-  "/optimization-meaning",
-  "/resources/*",
-  "/privacy",
-  "/terms",
-  "/checkout/done",
-  "/sitemap.xml",
-  "/robots.txt",
-  "/api/*"
+  "/*"
 ]
+
+[[d1_databases]]
+binding = "DB"
+# Shared production analytics D1. Rows are isolated by site_key.
+database_name = "openclaw-launch"
+database_id = "5c31068a-d85a-4c83-9efe-01e2de1ad22b"
