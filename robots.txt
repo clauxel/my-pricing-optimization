@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /checkout/done/
-Disallow: /resources/
 Sitemap: https://pricing-optimization.space/sitemap.xml
 Allow: /llms.txt

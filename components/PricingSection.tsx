@@ -70,7 +70,8 @@ export default function PricingSection() {
     planId: string;
     planName: string;
     popup: Window | null;
-  }>({ planId: "multi", planName: "Multi Product", popup: null });
+    provider: "creem" | "nowpayments";
+  }>({ planId: "multi", planName: "Multi Product", popup: null, provider: "creem" });
   const [launchKey, setLaunchKey] = useState(0);
   const [planFlowOpen, setPlanFlowOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -124,15 +125,15 @@ export default function PricingSection() {
     setPlanFlowOpen(true);
   }
 
-  function continueToPayment() {
+  function continueToPayment(provider: "creem" | "nowpayments" = "creem") {
     const plan = plans.find((item) => item.key === selectedPlan) || plans[1];
     if (!plan.paid) return;
-    const popup = openCheckoutShell(plan.name);
-    setCheckout({ planId: plan.key, planName: plan.name, popup });
+    const popup = openCheckoutShell(plan.name, provider);
+    setCheckout({ planId: plan.key, planName: plan.name, popup, provider });
     setPlanFlowOpen(false);
     setLaunchKey((value) => value + 1);
     setModalOpen(true);
-    trackEvent("checkout_continue", { plan: plan.key, billing });
+    trackEvent("checkout_continue", { plan: plan.key, billing, paymentProvider: provider });
   }
 
   const activePlan = plans.find((plan) => plan.key === selectedPlan) || plans[1];
@@ -363,7 +364,7 @@ export default function PricingSection() {
                 </button>
                 <button
                   type="button"
-                  onClick={continueToPayment}
+                  onClick={() => continueToPayment("creem")}
                   className="rounded-md bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 hover:bg-lime-300"
                 >
                   Continue to Payment
@@ -381,6 +382,7 @@ export default function PricingSection() {
         billing={billing}
         initialPopup={checkout.popup}
         launchKey={launchKey}
+        provider={checkout.provider}
         closeModal={() => setModalOpen(false)}
       />
     </section>

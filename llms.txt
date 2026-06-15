@@ -1,0 +1,21 @@
+# Pricing Optimization Software for B2B SaaS
+
+Pricing Optimization and AI Pricing Optimization software for B2B SaaS. Scan competitors, model price elasticity, connect Stripe, run A/B pricing tests, and get segment-level recommendations.
+
+Website: https://pricing-optimization.space/
+Pricing: https://pricing-optimization.space/pricing/
+Checkout: https://pricing-optimization.space/checkout/
+Support: support@aigeamy.com
+Type: Hosted SaaS workflow product
+
+Problem:
+- Teams need a quotable product definition, pricing path, evidence trail, and checkout route.
+
+Solution:
+- Pricing Optimization Software for B2B SaaS provides a hosted workflow with public pricing, structured evidence, support contact, and report or receipt outputs.
+
+Useful pages:
+- Home: https://pricing-optimization.space/
+- Pricing: https://pricing-optimization.space/pricing/
+- Resources: https://pricing-optimization.space/resources/
+- Sitemap: https://pricing-optimization.space/sitemap.xml
