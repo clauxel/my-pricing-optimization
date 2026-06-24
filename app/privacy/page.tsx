@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             <p className="mt-3">
               We may process contact details, account information, product usage, payment status, first-party analytics,
               competitor URLs submitted by users, and revenue metrics such as MRR, ARPU, churn, upgrades, downgrades, and
-              plan history. Payment details are processed by Creem and are not stored by us as full card numbers.
+              plan history. Payment details are processed by Polar and are not stored by us as full card numbers.
             </p>
           </section>
 

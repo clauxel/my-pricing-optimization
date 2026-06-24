@@ -6,7 +6,7 @@ Conversion-focused SaaS site for `pricing-optimization.space`.
 
 - Next.js static export
 - Cloudflare Pages
-- Cloudflare Worker with assets, analytics, sitemap, robots, and Creem checkout API
+- Cloudflare Worker with assets, analytics, sitemap, robots, and Polar checkout API
 - First-party analytics stored in Cloudflare KV when configured
 
 ## Local
